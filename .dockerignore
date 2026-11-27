@@ -5,6 +5,9 @@ __pycache__/
 .venv/
 venv/
 *.py[cod]
-test_*.py
+tests/
+docs/
+.gitignore
+pyproject.toml
 requirements-dev.txt
 .env

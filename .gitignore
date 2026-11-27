@@ -4,3 +4,6 @@ __pycache__/
 venv/
 .env
 *.py[cod]
+.coverage
+htmlcov/
+.ruff_cache/

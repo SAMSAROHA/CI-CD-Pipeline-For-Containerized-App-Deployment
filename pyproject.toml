@@ -1,0 +1,10 @@
+[project]
+name = "cicd-demo"
+version = "1.0.0"
+description = "A Flask service for a containerized CI/CD pipeline demonstration"
+requires-python = ">=3.12"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-ra"

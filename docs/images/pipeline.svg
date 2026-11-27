@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="470" viewBox="0 0 1200 470" role="img" aria-labelledby="title desc">
+  <title id="title">CI/CD pipeline from GitHub to an EC2 container host</title>
+  <desc id="desc">Pull requests build and test. Pushes to main build, publish a SHA-tagged image to GHCR, test it, and deploy it to EC2. The deployment health check either accepts the release or attempts rollback.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0b1220"/><stop offset="1" stop-color="#172554"/></linearGradient>
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#38bdf8"/><stop offset="1" stop-color="#2563eb"/></linearGradient>
+    <linearGradient id="green" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#34d399"/><stop offset="1" stop-color="#059669"/></linearGradient>
+    <filter id="shadow" x="-20%" y="-30%" width="140%" height="170%"><feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#020617" flood-opacity=".32"/></filter>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#94a3b8"/></marker>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#34d399"/></marker>
+  </defs>
+  <rect width="1200" height="470" rx="28" fill="url(#bg)"/>
+  <text x="56" y="62" fill="#f8fafc" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="700">From commit to healthy container</text>
+  <text x="56" y="91" fill="#94a3b8" font-family="Segoe UI,Arial,sans-serif" font-size="14">Three gated stages · immutable image tag · health-checked release</text>
+
+  <g filter="url(#shadow)">
+    <rect x="54" y="145" width="190" height="112" rx="18" fill="#1e293b" stroke="#475569"/>
+    <rect x="284" y="145" width="190" height="112" rx="18" fill="url(#blue)"/>
+    <rect x="514" y="145" width="190" height="112" rx="18" fill="#1e293b" stroke="#475569"/>
+    <rect x="744" y="145" width="190" height="112" rx="18" fill="url(#green)"/>
+    <rect x="974" y="145" width="172" height="112" rx="18" fill="#1e293b" stroke="#475569"/>
+  </g>
+  <g fill="none" stroke="#94a3b8" stroke-width="3" marker-end="url(#arrow)">
+    <path d="M245 201H276"/><path d="M475 201H506"/><path d="M705 201H736"/><path d="M935 201H966"/>
+  </g>
+  <g font-family="Segoe UI,Arial,sans-serif" text-anchor="middle">
+    <text x="149" y="184" fill="#7dd3fc" font-size="13" font-weight="700" letter-spacing="1.5">SOURCE</text>
+    <text x="149" y="214" fill="#f8fafc" font-size="19" font-weight="700">GitHub</text>
+    <text x="149" y="237" fill="#cbd5e1" font-size="13">PR or push to main</text>
+    <text x="379" y="184" fill="#e0f2fe" font-size="13" font-weight="700" letter-spacing="1.5">STAGE 1</text>
+    <text x="379" y="214" fill="#fff" font-size="19" font-weight="700">Build image</text>
+    <text x="379" y="237" fill="#dbeafe" font-size="13">Docker · SHA tag</text>
+    <text x="609" y="184" fill="#7dd3fc" font-size="13" font-weight="700" letter-spacing="1.5">STAGE 2</text>
+    <text x="609" y="214" fill="#f8fafc" font-size="19" font-weight="700">Test</text>
+    <text x="609" y="237" fill="#cbd5e1" font-size="13">pytest · health smoke</text>
+    <text x="839" y="184" fill="#d1fae5" font-size="13" font-weight="700" letter-spacing="1.5">STAGE 3</text>
+    <text x="839" y="214" fill="#fff" font-size="19" font-weight="700">Deploy</text>
+    <text x="839" y="237" fill="#d1fae5" font-size="13">main push only</text>
+    <text x="1060" y="184" fill="#7dd3fc" font-size="13" font-weight="700" letter-spacing="1.5">RUNTIME</text>
+    <text x="1060" y="214" fill="#f8fafc" font-size="19" font-weight="700">EC2</text>
+    <text x="1060" y="237" fill="#cbd5e1" font-size="13">Docker · port 80</text>
+  </g>
+
+  <rect x="284" y="293" width="420" height="106" rx="16" fill="#0f172a" stroke="#334155"/>
+  <text x="309" y="323" fill="#7dd3fc" font-family="Segoe UI,Arial,sans-serif" font-size="13" font-weight="700" letter-spacing="1">PULL REQUEST</text>
+  <text x="309" y="350" fill="#e2e8f0" font-family="Segoe UI,Arial,sans-serif" font-size="15">Build + tests run; deploy is skipped.</text>
+  <text x="309" y="376" fill="#94a3b8" font-family="Segoe UI,Arial,sans-serif" font-size="13">No image is published for a PR.</text>
+
+  <rect x="744" y="293" width="402" height="106" rx="16" fill="#0f172a" stroke="#334155"/>
+  <text x="769" y="323" fill="#34d399" font-family="Segoe UI,Arial,sans-serif" font-size="13" font-weight="700" letter-spacing="1">DEPLOY CHECK</text>
+  <text x="769" y="350" fill="#e2e8f0" font-family="Segoe UI,Arial,sans-serif" font-size="15">Healthy → keep release · failed → rollback attempt</text>
+  <text x="769" y="376" fill="#94a3b8" font-family="Segoe UI,Arial,sans-serif" font-size="13">Single host; first deployment has no prior image.</text>
+  <path d="M839 265V282" stroke="#34d399" stroke-width="3" marker-end="url(#arrowGreen)"/>
+  <text x="56" y="439" fill="#64748b" font-family="Segoe UI,Arial,sans-serif" font-size="12">Deployment is configured in the workflow and requires owner-provided GitHub secrets and infrastructure.</text>
+</svg>

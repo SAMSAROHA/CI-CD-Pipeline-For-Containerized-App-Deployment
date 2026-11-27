@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main]
 
+concurrency:
+  group: ci-cd-${{ github.ref }}
+  cancel-in-progress: false
+
 permissions:
   contents: read
 
@@ -13,6 +17,7 @@ jobs:
   build:
     name: Build container
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
       packages: write
@@ -45,6 +50,7 @@ jobs:
     name: Unit and container smoke tests
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
       packages: read
@@ -78,14 +84,21 @@ jobs:
         run: |
           set -euo pipefail
           docker run --detach --name smoke --publish 8080:8080 "$IMAGE"
-          trap 'docker logs smoke; docker rm -f smoke >/dev/null 2>&1 || true' EXIT
+          trap 'docker rm --force smoke >/dev/null 2>&1 || true' EXIT
           for attempt in {1..15}; do
-            if curl --fail --silent http://127.0.0.1:8080/health; then
-              exit 0
+            if response="$(curl --fail --silent --show-error --max-time 3 http://127.0.0.1:8080/health 2>/dev/null)"; then
+              if [[ "$response" == '{"status":"ok"}' ]]; then
+                echo "Container health check passed"
+                exit 0
+              fi
+              echo "Unexpected health response: $response" >&2
+              docker logs smoke
+              exit 1
             fi
             sleep 2
           done
           echo "Container did not become healthy" >&2
+          docker logs smoke
           exit 1
 
   deploy:
@@ -93,6 +106,7 @@ jobs:
     needs: [build, test]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     environment: production
     permissions:
       contents: read

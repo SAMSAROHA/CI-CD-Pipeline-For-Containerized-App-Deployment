@@ -1,4 +1,4 @@
-from app import app
+from cicd_demo.app import app
 
 
 def test_index():
@@ -13,3 +13,9 @@ def test_health():
 
     assert response.status_code == 200
     assert response.get_json() == {"status": "ok"}
+
+
+def test_unknown_route_returns_not_found():
+    response = app.test_client().get("/missing")
+
+    assert response.status_code == 404
