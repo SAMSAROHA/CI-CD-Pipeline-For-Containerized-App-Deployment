@@ -4,7 +4,7 @@
 
 A minimal Flask service packaged as a non-root Docker container, with a GitHub Actions workflow for image build, automated checks, and gated deployment to an EC2 host. The workflow uses immutable commit SHA image tags and checks application health before accepting a deployment.
 
-> **Project state:** GitHub Actions has run build and test. The first deployment attempt stopped with `Error: missing server host` because no EC2 host was configured. No EC2 connection was made. Deployment is now opt-in and defaults to off.
+> **Project state:** The latest GitHub Actions build and test passed. Two earlier deployment attempts stopped with `Error: missing server host` because no EC2 host was configured; neither connected to EC2. Deployment is now opt-in and defaults to off.
 
 ## Pipeline at a glance
 
