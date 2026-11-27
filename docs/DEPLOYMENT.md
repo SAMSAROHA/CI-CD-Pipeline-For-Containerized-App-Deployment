@@ -1,6 +1,6 @@
 # Deployment setup (deferred)
 
-This guide documents the workflow's expected GitHub and EC2 configuration. It does not create cloud resources or run a deployment. The deployment job in `.github/workflows/ci-cd.yml` activates only for pushes to `main` after build and test pass.
+This guide documents the workflow's expected GitHub and EC2 configuration. It does not create cloud resources or run a deployment. Build and test run for pushes to `main`; deployment is available only through a manual `workflow_dispatch` with the `deploy` input enabled. That input defaults to false.
 
 ## What the workflow expects
 
@@ -19,7 +19,7 @@ This guide documents the workflow's expected GitHub and EC2 configuration. It do
 4. Add `EC2_HOST` and `EC2_USER` as GitHub Actions secrets, and add `EC2_SSH_KEY` to the `production` environment if using environment-scoped secrets.
 5. Confirm the GHCR package is pullable from the server. Public package access avoids storing a registry credential on the host; if the package is private, configure a narrowly scoped read credential on the host before enabling deploy.
 6. Protect `main` with required build/test checks and configure `production` reviewers before allowing a deployment.
-7. When ready, make a controlled push to `main`, observe the workflow and verify the service from the server. Record the run link and result in [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
+7. Validate build and test without enabling deployment. Only after the server and secrets are ready, manually dispatch the workflow from `main` with `deploy` enabled. Record the run link and result in [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
 
 ## Network and access tradeoffs
 

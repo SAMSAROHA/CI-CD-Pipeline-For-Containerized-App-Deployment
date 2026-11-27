@@ -1,6 +1,6 @@
 # Troubleshooting and evidence log
 
-The table gives likely causes and checks. These are not a record of incidents: no GitHub Actions workflow, GHCR push, or EC2 deployment has been run for this project yet.
+The table gives likely causes and checks. One GitHub Actions run is recorded below. No EC2 host was configured, and the SSH action stopped before connecting to a server.
 
 ## Common failure patterns
 
@@ -14,7 +14,11 @@ The table gives likely causes and checks. These are not a record of incidents: n
 | SSH | Connection timeout/refused | Host, user, SSH service, or network ingress is wrong | Check `EC2_HOST`, `EC2_USER`, server SSH status, and ingress policy without exposing SSH broadly by default |
 | Container start | `port is already allocated` | Port 80 is already occupied | Inspect server port usage and stop or reconfigure the conflicting service |
 | Deploy health check | `/health` does not become healthy | App failed to start, wrong port mapping, or health route is unavailable | Inspect `docker logs app` on the host; workflow attempts to restart the prior image if one exists |
-| Deploy skipped | PR does not deploy | Expected: deploy is restricted to pushes on `main` | Merge after required checks; do not remove the deployment guard just to test a PR |
+| Deploy skipped | Push or PR does not deploy | Expected: deploy requires a manual dispatch from `main` with `deploy` enabled | Leave deployment disabled to avoid EC2; enable it only after host secrets and infrastructure are ready |
+
+## Observed run
+
+On 2026-11-27, run [46017226240](https://github.com/SAMSAROHA/CI-CD-Pipeline-For-Containerized-App-Deployment/actions/runs/46017226240) failed at the deploy step with `Error: missing server host`. `EC2_HOST` was absent, so the SSH action could not start a connection. No EC2 request was made. The workflow now skips deploy on pushes and requires a manual dispatch with `deploy` enabled; it also checks all three secrets before starting SSH.
 
 ## Failure drills
 
@@ -26,4 +30,4 @@ Add an entry after a real run or local drill. Keep logs free of secrets.
 
 | Date | Run URL or local command | Observed symptom | Root cause | Fix and prevention |
 | --- | --- | --- | --- | --- |
-| _No runs recorded yet._ | — | — | — | — |
+| 2026-11-27 | [Actions run 46017226240](https://github.com/SAMSAROHA/CI-CD-Pipeline-For-Containerized-App-Deployment/actions/runs/46017226240) | `Error: missing server host` | `EC2_HOST` was not configured; there is no deployment host in this project setup | Make deployment manual and opt-in; validate required secrets before SSH. Configure a real host only if deployment is intentionally enabled. |

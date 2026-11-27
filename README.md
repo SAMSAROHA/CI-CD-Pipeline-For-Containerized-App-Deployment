@@ -4,13 +4,13 @@
 
 A minimal Flask service packaged as a non-root Docker container, with a GitHub Actions workflow for image build, automated checks, and gated deployment to an EC2 host. The workflow uses immutable commit SHA image tags and checks application health before accepting a deployment.
 
-> **Project state:** The repository and workflow configuration are prepared. No GitHub Actions run, GHCR publication, EC2 provisioning, or live deployment has been performed. Deployment claims should be updated only after a real run is verified.
+> **Project state:** GitHub Actions has run build and test. The first deployment attempt stopped with `Error: missing server host` because no EC2 host was configured. No EC2 connection was made. Deployment is now opt-in and defaults to off.
 
 ## Pipeline at a glance
 
 ![CI/CD pipeline diagram](docs/images/pipeline.svg)
 
-Pull requests build the image and run unit and container smoke checks. A push to `main` also publishes the SHA-tagged image to GHCR. Deployment runs only after both build and test pass, and it is protected by the GitHub `production` environment.
+Pull requests build the image and run unit and container smoke checks. A push to `main` publishes the SHA-tagged image to GHCR and runs both checks. **Production deployment is opt-in:** use the `workflow_dispatch` form and enable its `deploy` checkbox only after configuring the host and secrets. It defaults to off, so pushes and ordinary manual CI runs do not contact EC2.
 
 ## Repository layout
 
@@ -70,21 +70,21 @@ In another terminal, open `http://localhost:8080/` and `http://localhost:8080/he
 
 ## CI/CD behavior
 
-| Stage | Pull request to `main` | Push to `main` |
-| --- | --- | --- |
-| Build | Builds the container locally in the runner | Builds and publishes `ghcr.io/<owner>/<repo>:<commit-sha>` |
-| Test | Runs pytest and a container health smoke test | Runs pytest and tests the published image |
-| Deploy | Skipped | Runs after successful build and test, using the `production` environment |
+| Stage | Pull request to `main` | Push to `main` | Manual run (`deploy` off / on) |
+| --- | --- | --- | --- |
+| Build | Builds the container locally in the runner | Builds and publishes `ghcr.io/<owner>/<repo>:<commit-sha>` | Off: local build / On: publishes SHA image |
+| Test | Runs pytest and a container health smoke test | Runs pytest and tests the published image | Runs pytest and smoke test |
+| Deploy | Skipped | Skipped | Off: skipped / On: runs after checks, using `production` |
 
-The workflow uses `GITHUB_TOKEN` for GHCR. The deploy job pulls the image on the server, replaces the `app` container, checks `/health`, and attempts to restore the previous image if the new container fails. Review the known limitations in [Deployment setup](docs/DEPLOYMENT.md) before enabling it.
+The workflow uses `GITHUB_TOKEN` for GHCR. The deploy job pulls the image on the server, replaces the `app` container, checks `/health`, and attempts to restore the previous image if the new container fails. If you want to keep this project fully off EC2, leave the manual `deploy` checkbox off; build and test can still run. If you dispatch from a branch other than `main`, the workflow tests a local image and skips deploy. Review the known limitations in [Deployment setup](docs/DEPLOYMENT.md) before enabling deployment.
 
 ## Configure a future deployment
 
-Deployment is intentionally not enabled in this workspace. Follow [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) only when you are ready to configure GitHub secrets and an EC2 host. It explains the required secrets, registry visibility, environment protection, and SSH network tradeoffs.
+Deployment is disabled by default. Follow [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) only when you are ready to configure GitHub secrets and an EC2 host. It explains the required secrets, registry visibility, environment protection, and SSH network tradeoffs.
 
 ## Troubleshooting and evidence
 
-[docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) lists common failure patterns and a log for real runs. The diagnoses are guidance, not claims that those failures have occurred. Add a run URL, observed error, cause, fix, and prevention after reproducing an issue.
+[docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) lists common failure patterns and records the observed missing-host failure from the initial Actions run, along with the workflow change that prevents an accidental production attempt.
 
 ## Resume wording
 
